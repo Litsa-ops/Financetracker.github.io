@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Personal Finance Tracker</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-pink-200 p-6 flex items-center h-screen">
+    <div class="relative h-screen"></div>
+    <div class="w-2/3 h-screen bg-[url('p.jpg')] rounded-lg shadow-md mr-10 opacity-65"></div>
+    <h1 class="absolute top-110 left-1/4 transform -translate-x-1/3 text-6xl font-extrabold font-Times New Roman">
+        Personal Finance Tracker
+    </h1>
+    <div class="w-1/3 h-full flex items-center justify-center bg-white p-6 rounded-lg shadow-md text-gray-900">
+        <div class="w-full">
+            <form id="expense-form" class="mb-4">
+                <div class="flex flex-wrap -mx-3 mb-6">
+                    <div class="w-full md:w-1/2 px-3 mb-6 md:mb-0">
+                      <label class="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2">
+                         Name
+                      </label>
+                      <input class="w-full p-2 border rounded mb-3" id="expense-name" type="text" placeholder="Account Name">
+                    </div>
+                    <div class="w-full md:w-1/2 px-2">
+                        <label class="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2">
+                            Expense Amount
+                         </label>
+                        <input type="number" id="expense-amount" placeholder="Amount" class="w-full p-2 border rounded mb-3">
+                    </div>
+                </div>
+                <div class="w-full px-3">
+                    <label class="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-3">
+                        Expense Category
+                    </label>
+                    <select id="expense-category" class="w-full p-2 border rounded mb-3">
+                        <option value="Food">Food</option>
+                        <option value="Transport">Transport</option>
+                        <option value="Entertainment">Entertainment</option>
+                        <option value="Other">Other</option>
+                    </select>
+                </div>
+                <button type="submit" class="w-full border-purple-200 text-purple-600 hover:border-transparent hover:bg-purple-600 hover:text-white active:bg-purple-700 p-3 rounded">Add Expense</button>
+            </form>
+            <h3 class="text-lg font-semibold mb-2">Expenses:</h3>
+            <ul id="expense-list" class="mb-4 h-40 overflow-y-auto border p-2 rounded"></ul>
+            <h3 class="text-lg font-semibold">Total Expenses:</h3>
+            <p id="total-expenses" class="text-gray-700 font-bold">$0</p>
+            <button onclick="resetExpenses()" class="w-full border-purple-200 text-purple-600 hover:border-transparent hover:bg-purple-600 hover:text-white active:bg-purple-700 p-3 rounded">New Account</button>
+        </div>
+    </div>
+        <script>
+        let expenses = JSON.parse(localStorage.getItem('expenses')) || [];
+        document.getElementById('expense-name').value = localStorage.getItem('expenseName') || '';
+        document.getElementById('expense-form').addEventListener('submit', function(event) {
+            event.preventDefault();       
+            let name = document.getElementById('expense-name').value;
+            let amount = parseFloat(document.getElementById('expense-amount').value);
+            let category = document.getElementById('expense-category').value;          
+            if (name && amount) {
+                expenses.push({ name, amount, category });
+                localStorage.setItem('expenses', JSON.stringify(expenses));
+                localStorage.setItem('expenseName', name);
+                updateExpenseList();
+                updateTotalExpenses();
+                document.getElementById('expense-amount').value = '';
+                document.getElementById('expense-category').value = 'Food';
+            }
+        });
+        function updateExpenseList() {
+            let list = document.getElementById('expense-list');
+            list.innerHTML = '';           
+            expenses.forEach((expense, index) => {
+                let li = document.createElement('li');
+                li.innerHTML = `
+                    ${expense.name} - $${expense.amount} (${expense.category}) 
+                    <button onclick="deleteExpense(${index})" class="ml-2 text-red-500">❌</button>
+                `;
+                li.classList.add('p-2', 'border', 'rounded', 'mb-2', 'bg-gray-200', 'flex', 'justify-between');
+                list.appendChild(li);
+            });
+        }
+        function updateTotalExpenses() {
+            let total = expenses.reduce((sum, expense) => sum + expense.amount, 0);
+            document.getElementById('total-expenses').textContent = `$${total.toFixed(2)}`;
+        }
+        function deleteExpense(index) {
+            expenses.splice(index, 1);
+            localStorage.setItem('expenses', JSON.stringify(expenses));
+            updateExpenseList();
+            updateTotalExpenses();
+        }
+        function resetExpenses() {
+            localStorage.removeItem('expenses'); // Remove stored expenses
+            localStorage.removeItem('expenseName'); // Remove stored name
+            expenses = [];
+            document.getElementById('expense-name').value = ''; // Clear name field
+            updateExpenseList();
+            updateTotalExpenses();
+        }
+        updateExpenseList();
+        updateTotalExpenses();
+    </script>
+</body>
+</html>
+
+
+
+
+
+
+
+
