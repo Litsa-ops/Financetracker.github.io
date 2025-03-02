@@ -7,11 +7,15 @@
     <script src="https://cdn.tailwindcss.com"></script>
 </head>
 <body class="bg-pink-200 p-6 flex items-center h-screen">
+
+    <!-- Left Section with Background Image -->
     <div class="relative h-screen"></div>
     <div class="w-2/3 h-screen bg-[url('p.jpg')] rounded-lg shadow-md mr-10 opacity-65"></div>
     <h1 class="absolute top-110 left-1/4 transform -translate-x-1/3 text-6xl font-extrabold font-Times New Roman">
         Personal Finance Tracker
     </h1>
+
+    <!-- Finance Tracker (Right Section) -->
     <div class="w-1/3 h-full flex items-center justify-center bg-white p-6 rounded-lg shadow-md text-gray-900">
         <div class="w-full">
             <form id="expense-form" class="mb-4">
@@ -42,54 +46,70 @@
                 </div>
                 <button type="submit" class="w-full border-purple-200 text-purple-600 hover:border-transparent hover:bg-purple-600 hover:text-white active:bg-purple-700 p-3 rounded">Add Expense</button>
             </form>
+            
             <h3 class="text-lg font-semibold mb-2">Expenses:</h3>
+            <!-- Expense List with Scrollbar -->
             <ul id="expense-list" class="mb-4 h-40 overflow-y-auto border p-2 rounded"></ul>
+
             <h3 class="text-lg font-semibold">Total Expenses:</h3>
             <p id="total-expenses" class="text-gray-700 font-bold">$0</p>
             <button onclick="resetExpenses()" class="w-full border-purple-200 text-purple-600 hover:border-transparent hover:bg-purple-600 hover:text-white active:bg-purple-700 p-3 rounded">New Account</button>
         </div>
     </div>
-        <script>
+
+    <script>
         let expenses = JSON.parse(localStorage.getItem('expenses')) || [];
+
+        // Retrieve stored name (if available)
         document.getElementById('expense-name').value = localStorage.getItem('expenseName') || '';
+
         document.getElementById('expense-form').addEventListener('submit', function(event) {
-            event.preventDefault();       
+            event.preventDefault();
+            
             let name = document.getElementById('expense-name').value;
             let amount = parseFloat(document.getElementById('expense-amount').value);
-            let category = document.getElementById('expense-category').value;          
+            let category = document.getElementById('expense-category').value;
+            
             if (name && amount) {
                 expenses.push({ name, amount, category });
                 localStorage.setItem('expenses', JSON.stringify(expenses));
-                localStorage.setItem('expenseName', name);
+                localStorage.setItem('expenseName', name); // Store the name so it persists
                 updateExpenseList();
                 updateTotalExpenses();
+                
+                // Reset the form except the name field
                 document.getElementById('expense-amount').value = '';
                 document.getElementById('expense-category').value = 'Food';
             }
         });
+
         function updateExpenseList() {
             let list = document.getElementById('expense-list');
-            list.innerHTML = '';           
+            list.innerHTML = '';
+            
             expenses.forEach((expense, index) => {
                 let li = document.createElement('li');
-                li.innerHTML = 
+                li.innerHTML = `
                     ${expense.name} - $${expense.amount} (${expense.category}) 
                     <button onclick="deleteExpense(${index})" class="ml-2 text-red-500">❌</button>
-                ;
+                `;
                 li.classList.add('p-2', 'border', 'rounded', 'mb-2', 'bg-gray-200', 'flex', 'justify-between');
                 list.appendChild(li);
             });
         }
+
         function updateTotalExpenses() {
             let total = expenses.reduce((sum, expense) => sum + expense.amount, 0);
-            document.getElementById('total-expenses').textContent = $${total.toFixed(2)};
+            document.getElementById('total-expenses').textContent = `$${total.toFixed(2)}`;
         }
+
         function deleteExpense(index) {
             expenses.splice(index, 1);
             localStorage.setItem('expenses', JSON.stringify(expenses));
             updateExpenseList();
             updateTotalExpenses();
         }
+
         function resetExpenses() {
             localStorage.removeItem('expenses'); // Remove stored expenses
             localStorage.removeItem('expenseName'); // Remove stored name
@@ -98,11 +118,15 @@
             updateExpenseList();
             updateTotalExpenses();
         }
+
+        // Load existing expenses
         updateExpenseList();
         updateTotalExpenses();
     </script>
+
 </body>
 </html>
+
 
 
 
